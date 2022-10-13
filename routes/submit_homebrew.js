@@ -93,7 +93,7 @@ router.post("/", async (req, res, next) => {
     await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
-      `Some of your fields are not filled right or you have missed to fill them. Fields with "#" must be numbers. Plese try again.`,
+      `Some of your fields are not filled right or you have missed to fill them. Fields with "#" must be numbers . Plese try again.`,
       500
     );
     return next(error);
@@ -104,11 +104,11 @@ router.post("/", async (req, res, next) => {
 
 
 
-router.get("/", async (req, res, next) => {
-  console.log(req.body)
+// router.get("/", async (req, res, next) => {
 
 
-  res.status(201).json(createdMonster);
-});
+
+//   res.status(201).json(createdMonster);
+// });
 
 module.exports = router;
