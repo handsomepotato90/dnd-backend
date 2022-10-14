@@ -3,9 +3,10 @@ const router = express.Router();
 const Monster = require("../models/monsters");
 const HttpError = require("../models/http-error");
 const { default: mongoose } = require("mongoose");
+
 router.post("/", async (req, res, next) => {
   try {
-    monster = await Monster.find({creator: req.body.user });
+    monster = await Monster.find({creator: req.body.user }).limit(req.body.limit);
   } catch (err) {
     const error = new HttpError(
       `Can't fetch all creatures. Try again later.`,

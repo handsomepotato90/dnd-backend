@@ -103,12 +103,4 @@ router.post("/", async (req, res, next) => {
 
 
 
-
-// router.get("/", async (req, res, next) => {
-
-
-
-//   res.status(201).json(createdMonster);
-// });
-
 module.exports = router;
