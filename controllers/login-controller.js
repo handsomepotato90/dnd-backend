@@ -55,7 +55,7 @@ const signup = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: createdUser.id, email: createdUser.email },
-      "j289hj89y#!238989#216489yfr&*!@HD7821786476&*^&*H&2d71!g$hwe6&&&67863g88BHhhjg412!$@!$jkhjkHh7&$!*1^*K!89hhVG^&%gtg675^&&^%$RF5456f5^R%^R567&^*&678y78y78&^&*@#ghfgak",
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (err) {
@@ -107,7 +107,7 @@ const login = async (req, res, next) => {
   try {
     token = jwt.sign(
       { userId: existingUser.id, email: existingUser.email },
-      "j289hj89y#!238989#216489yfr&*!@HD7821786476&*^&*H&2d71!g$hwe6&&&67863g88BHhhjg412!$@!$jkhjkHh7&$!*1^*K!89hhVG^&%gtg675^&&^%$RF5456f5^R%^R567&^*&678y78y78&^&*@#ghfgak",
+      process.env.JWT_KEY,
       { expiresIn: "1h" }
     );
   } catch (err) {

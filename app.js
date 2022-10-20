@@ -23,7 +23,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
   next();
 });
-const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 
@@ -55,7 +55,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://Handsomepotato:8VzohWGvbVvbFoyz@dnd.mcdpizu.mongodb.net/?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.DB}.mcdpizu.mongodb.net/?retryWrites=true&w=majority`
   )
   .then(() => {
     app.listen(port, () => {
