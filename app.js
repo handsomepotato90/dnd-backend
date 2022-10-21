@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     "Origin,X-Requesterd-With,Content-Type, Accept, Authorization"
   );
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
-  res.setHeader("Set-Cookie", "HttpOnly;Secure;SameSite=None");
+  res.setHeader("Set-Cookie","Secure;SameSite=None");
   next();
 });
 const port = process.env.PORT || 5000;
