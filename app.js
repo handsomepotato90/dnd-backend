@@ -59,8 +59,6 @@ mongoose
     `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.DB}.mcdpizu.mongodb.net/?retryWrites=true&w=majority`
   )
   .then(() => {
-    app.listen(port, () => {
-      console.log(`Listening to port ${port}...`);
-    });
+    app.listen(port);
   })
   .catch((err) => console.log(err));
