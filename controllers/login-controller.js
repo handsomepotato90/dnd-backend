@@ -84,7 +84,7 @@ const signup = async (req, res, next) => {
       maxAge: 365 * 24 * 60 * 60 * 1000,
       httpOnly: false,
     })
-    .json({ user: createdUser, token: token });
+    .json({ user: createdUser.id, token: token });
 };
 
 const login = async (req, res, next) => {
@@ -225,7 +225,7 @@ const facebook = async (req, res, next) => {
       maxAge: 365 * 24 * 60 * 60 * 1000,
       httpOnly: false,
     })
-    .json({ user: existingUser, token: token });
+    .json({ user: existingUser.toObject({ getters: true }), token: token });
 };
 
 const google = async (req, res, next) => {
@@ -298,11 +298,11 @@ const google = async (req, res, next) => {
       maxAge: 365 * 24 * 60 * 60 * 1000,
       httpOnly: false,
     })
-    .json({ user: existingUser, token: token });
+    .json({ user: existingUser.toObject({ getters: true }), token: token });
 };
 
 const remember = async (req, res, next) => {
-  const compare = jwt.verify(req.cookies.rmTOKEN,process.env.JWT_COOKIE_KEY)
+  const compare = jwt.verify(req.cookies.rmTOKEN, process.env.JWT_COOKIE_KEY);
   if (!compare.remember) {
     const error = new HttpError(`Can't find user with this username.`, 404);
     return next(error);
@@ -310,7 +310,7 @@ const remember = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findOne({
-      name:compare.name,
+      name: compare.name,
       "rememberMe.token": req.cookies.rmTOKEN,
       "rememberMe.remember": compare.remember,
     });
