@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 const HttpError = require("./models/http-error");
 const voting = require("./routes/routes-voting");
@@ -14,20 +15,26 @@ const editMonster = require("./routes/Edit");
 const mongoose = require("mongoose");
 
 const app = express();
+const port = process.env.PORT || 5000;
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = ['http://localhost:3000', 'https://danddragons-9f9de.web.app/',];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+       res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin,X-Requesterd-With,Content-Type, Accept, Authorization"
   );
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
-  res.setHeader("Set-Cookie","Secure;SameSite=None");
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader("Set-Cookie"," SameSite=None; Secure");
   next();
 });
-const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
-
+app.use(cookieParser())
 app.use("/battle_scr", battleScreen);
 app.use("/voting", voting);
 app.use("/my_encounters", myEncounters);

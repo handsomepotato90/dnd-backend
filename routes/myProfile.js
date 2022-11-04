@@ -3,6 +3,8 @@ const router = express.Router();
 const Monster = require("../models/monsters");
 const HttpError = require("../models/http-error");
 const { default: mongoose } = require("mongoose");
+const ckeckAuth = require("../controllers/checkAuth");
+
 
 router.post("/", async (req, res, next) => {
   try {
@@ -19,6 +21,8 @@ router.post("/", async (req, res, next) => {
   }
   res.status(201).json(monster);
 });
+
+router.use(ckeckAuth);
 
 router.delete("/:id", async (req, res, next) => {
   try {

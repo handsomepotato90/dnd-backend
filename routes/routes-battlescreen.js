@@ -38,14 +38,14 @@ router.delete("/:id", async (req, res, next) => {
       delEnc = await Encounter.findById(req.params.id).populate('creator');
     } catch (err) {
       const error = new HttpError(
-        `Delete failed.${err}`,
+        `Delete failed.`,
         500
       );
       return next(error);
     }
     if(!delEnc){
       const error = new HttpError(
-        `Can't find Encounter.${err}`,
+        `Can't find Encounter.`,
         500
       );
       return next(error);
@@ -66,7 +66,7 @@ router.delete("/:id", async (req, res, next) => {
       await sess.commitTransaction();
     } catch (err) {
       const error = new HttpError(
-        `Delete failed reason:.${err}`,
+        `Delete failed reason:.`,
         500
       );
       return next(error);
