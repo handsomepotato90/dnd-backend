@@ -12,6 +12,7 @@ router.post("/", async (req, res, next) => {
     enc_name: req.body.enc_name,
     creator: req.body.creator,
     monsters: [],
+    players:[],
   });
   req.body.monsters.forEach((monster, i) => {
     encounter['monsters'].push({
@@ -19,7 +20,11 @@ router.post("/", async (req, res, next) => {
       img: monster.img,
     });
   });
-  
+  req.body.numberAndLevelOfPlayers.forEach((pc, i) => {
+    encounter['players'].push({
+      level: pc.player,
+    });
+  });
   let user;
   try {
     user = await User.findById(req.body.creator);

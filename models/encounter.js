@@ -10,6 +10,11 @@ const encouterSchema = new mongoose.Schema(
         img:  { type: String, required: true },
       },
     ],
+    players: [
+      {
+        level:  { type: Number, required: true },
+      },
+    ],
   },
 );
 

@@ -16,10 +16,13 @@ router.get("/:id", async (req, res, next) => {
     const error = new HttpError(`${err}`, 500);
     return next(error);
   }
-  let participent;
+  let participent= {
+    monsters:[],
+    players:encounterOnFocus.players,
+  };
 
   try {
-    participent = await Promise.all(
+    participent["monsters"] = await Promise.all(
       encounterOnFocus.monsters.map(async (element) => {
         const part = await Monster.find({ name: element.name });
         return part;
@@ -29,7 +32,6 @@ router.get("/:id", async (req, res, next) => {
     const error = new HttpError(`${err}`, 500);
     return next(error);
   }
-
   res.status(201).json(participent);
 });
 router.use(ckeckAuth);
