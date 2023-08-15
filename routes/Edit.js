@@ -9,7 +9,6 @@ const ckeckAuth = require("../controllers/checkAuth");
 
 router.get("/:id", async (req, res, next) => {
   const monsterId = req.params.id;
-  console.log(req)
   try {
     monster = await Monster.findById(monsterId).exec();
   } catch (err) {

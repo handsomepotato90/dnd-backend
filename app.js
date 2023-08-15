@@ -10,7 +10,9 @@ const newEncounter = require("./routes/build_encounter");
 const userLogin = require("./routes/route-login");
 const monsterLibrary = require("./routes/monster_library");
 const nameChecker = require("./routes/nameChecker");
-const myProfile = require("./routes/myProfile");
+const myUploads = require("./routes/myUploads");
+const Friends = require("./routes/Friends");
+const ChangeUserCredentials = require("./routes/ChangeUserCredentials");
 const editMonster = require("./routes/Edit");
 const mongoose = require("mongoose");
 
@@ -28,6 +30,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin,X-Requesterd-With,Content-Type, Accept, Authorization"
   );
+  res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
   res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader("Set-Cookie", " SameSite=None; Secure");
@@ -43,8 +46,10 @@ app.use("/submit_homebrew", newHomebrew);
 app.use("/build_encounter", monsterLibrary);
 app.use("/build_encounter/submit_new_enc", newEncounter);
 app.use("/submit_homebrew/check_name", nameChecker);
-app.use("/myProfile", myProfile);
-app.use("/myProfile/Edit", editMonster);
+app.use("/myProfile", ChangeUserCredentials);
+app.use("/myProfile/Friends", Friends);
+app.use("/myProfile/MyUploads", myUploads);
+app.use("/myProfile/MyUploads/Edit", editMonster);
 
 app.use("/", userLogin);
 

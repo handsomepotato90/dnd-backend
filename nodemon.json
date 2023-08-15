@@ -1,5 +1,7 @@
 {
   "env": {
+    "CLIENT_ID":"935993487799-3sfsjrrfjh8qol2fe65pjjt3ik0tcpqn.apps.googleusercontent.com",
+    "CLIENT_SECRET":"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",
     "USER": "Handsomepotato",
     "PASSWORD": "8VzohWGvbVvbFoyz",
     "DB": "dnd",

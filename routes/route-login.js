@@ -17,6 +17,8 @@ router.post("/login", loginController.login);
 router.post("/remember", loginController.remember);
 router.post("/facebook", loginController.facebook);
 router.post("/google", loginController.google);
+router.post("/refresh-google-token", loginController.googleRefresh);
+
 
 
 

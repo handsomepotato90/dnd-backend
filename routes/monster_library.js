@@ -10,7 +10,7 @@ router.get("/", async (req, res, next) => {
     monster = await Monster.find({
       $or: [{ timeforvoting: { $lt: now } }, { number: { $gt: 0 } }],
     })
-      .limit(10)
+      .limit(12)
       .exec();
   } catch (err) {
     const error = new HttpError(`Can't find monsters.`, 404);

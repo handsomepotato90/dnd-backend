@@ -3,6 +3,14 @@ const User = require("../models/user");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+const { UserRefreshClient } = require("google-auth-library");
+const process = require("../nodemon.json");
+const oAuth2Client = new OAuth2Client(
+  process.env.CLIENT_ID,
+  process.env.CLIENT_SECRET,
+  "postmessage"
+);
 
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
@@ -104,7 +112,7 @@ const login = async (req, res, next) => {
     }
   }
   try {
-    existingUser = await User.findOne({ name: name });
+    existingUser = await User.findOne({ name: name }).select("name");
   } catch (err) {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
@@ -138,7 +146,7 @@ const login = async (req, res, next) => {
   let token;
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
+      {userId: existingUser.id },
       process.env.JWT_KEY,
       { expiresIn: "30d" }
     );
@@ -163,7 +171,7 @@ const facebook = async (req, res, next) => {
   let hashedPass;
   let token;
   try {
-    existingUser = await User.findOne({ email: req.body.email });
+    existingUser = await User.findOne({ email: req.body.email }).select("name");
   } catch (err) {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
@@ -229,38 +237,29 @@ const facebook = async (req, res, next) => {
 };
 
 const google = async (req, res, next) => {
-  const decodedToken = jwt.decode(req.body.googleToken);
+  const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
+
+  const decodedToken = jwt.decode(tokens.id_token);
   let existingUser;
   let rememberMeHash;
   let hashedPass;
   let token;
   try {
-    existingUser = await User.findOne({ email: decodedToken.email });
+    existingUser = await User.findOne({ email: decodedToken.email }).select(
+      "name"
+    );
   } catch (err) {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
   }
-  if (req.body.remember) {
-    try {
-      rememberMeHash = jwt.sign(
-        {
-          name: existingUser.name,
-          remember: req.body.remember,
-        },
-        process.env.JWT_COOKIE_KEY,
-        { expiresIn: "365d" }
-      );
-    } catch (err) {
-      const error = new HttpError(`Signup failed. Try again later.`, 500);
-      return next(error);
-    }
-  }
-  try {
-    hashedPass = await bcrypt.hash(req.body.password, 12);
-  } catch (err) {
-    const error = new HttpError(`Could not create user,plaese try again.`, 500);
-    return next(error);
-  }
+
+  // try {
+  //   hashedPass = await bcrypt.hash(existingUser.email, 12);
+  // } catch (err) {
+  //   const error = new HttpError(`Could not create user,plaese try again.`, 500);
+  //   return next(error);
+  // }
+
   if (!existingUser) {
     const existingUser = new User({
       name: decodedToken.name,
@@ -275,6 +274,20 @@ const google = async (req, res, next) => {
       return next(error);
     }
   }
+
+  try {
+    rememberMeHash = jwt.sign(
+      {
+        name: existingUser.name,
+        remember: req.body.remember,
+      },
+      process.env.JWT_COOKIE_KEY,
+      { expiresIn: "365d" }
+    );
+  } catch (err) {
+    const error = new HttpError(`Signup failed. Try again later.`, 500);
+    return next(error);
+  }
   await existingUser.updateOne({
     rememberMe: {
       remember: req.body.remember,
@@ -284,7 +297,48 @@ const google = async (req, res, next) => {
 
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
+      {userId: existingUser.id },
+      process.env.JWT_KEY,
+      { expiresIn: "30d" }
+    );
+  } catch (err) {
+    const error = new HttpError(`Login failed. Try again later.`, 500);
+    return next(error);
+  }
+  res
+    .cookie("rmTOKEN", rememberMeHash, {
+      maxAge: 365 * 24 * 60 * 60 * 1000,
+      httpOnly: false,
+    })
+    .json({
+      user: existingUser.toObject({ getters: true }),
+      token: token,
+      google_auth: {
+        refresh_token: tokens.refresh_token,
+        expiry_date: tokens.expiry_date,
+      },
+    });
+};
+
+const googleRefresh = async (req, res, next) => {
+  const user = new UserRefreshClient(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    req.body.token
+  );
+  const { credentials } = await user.refreshAccessToken(); // optain new tokens
+  const decodedToken = jwt.decode(credentials.id_token);
+  try {
+    existingUser = await User.findOne({ email: decodedToken.email }).select(
+      "name"
+    );
+  } catch (err) {
+    const error = new HttpError(`Something went wrong try again later.`, 500);
+    return next(error);
+  }
+  try {
+    token = jwt.sign(
+      {userId: existingUser.id },
       process.env.JWT_KEY,
       { expiresIn: "30d" }
     );
@@ -293,12 +347,14 @@ const google = async (req, res, next) => {
     return next(error);
   }
 
-  res
-    .cookie("rmTOKEN", rememberMeHash, {
-      maxAge: 365 * 24 * 60 * 60 * 1000,
-      httpOnly: false,
-    })
-    .json({ user: existingUser.toObject({ getters: true }), token: token });
+  res.json({
+    user: existingUser.toObject({ getters: true }),
+    token: token,
+    google_auth: {
+      refresh_token: credentials.refresh_token,
+      expiry_date: credentials.expiry_date,
+    },
+  });
 };
 
 const remember = async (req, res, next) => {
@@ -313,7 +369,7 @@ const remember = async (req, res, next) => {
       name: compare.name,
       "rememberMe.token": req.cookies.rmTOKEN,
       "rememberMe.remember": compare.remember,
-    });
+    }).select("name email");
   } catch (err) {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
@@ -322,7 +378,7 @@ const remember = async (req, res, next) => {
   let token;
   try {
     token = jwt.sign(
-      { userId: existingUser.id, email: existingUser.email },
+      {userId: existingUser.id },
       process.env.JWT_KEY,
       { expiresIn: "30d" }
     );
@@ -338,6 +394,7 @@ const remember = async (req, res, next) => {
 };
 
 exports.google = google;
+exports.googleRefresh = googleRefresh;
 exports.remember = remember;
 exports.signup = signup;
 exports.login = login;
