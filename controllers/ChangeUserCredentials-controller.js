@@ -42,6 +42,7 @@ const change_username = async (req, res, next) => {
 const change_password = async (req, res, next) => {
   const userDataChange = req.body;
   let hashedPass;
+  console.log(userDataChange.password)
 
 
   if (userDataChange.password.trim() !== userDataChange.re_password.trim()) {
@@ -68,7 +69,7 @@ const change_password = async (req, res, next) => {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
   }
-  
+
   res.status(201).json();
 };
 const change_mail = async (req, res, next) => {};

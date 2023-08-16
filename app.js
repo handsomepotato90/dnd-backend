@@ -22,8 +22,8 @@ const port = process.env.PORT || 5000;
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    // "http://localhost:3000"
-    "https://danddragons-9f9de.web.app"
+    "http://localhost:3000"
+    // "https://danddragons-9f9de.web.app"
   );
 
   res.setHeader(
