@@ -12,7 +12,11 @@ const userSchema = new mongoose.Schema({
   friends:[{type: mongoose.Types.ObjectId}],
   friendRequest:[{type: mongoose.Types.ObjectId}],
   monsters: [{type: mongoose.Types.ObjectId , required:true , ref:"monsters"}],
-  encounters: [{type: mongoose.Types.ObjectId , required:true , ref:"encounters"}]
+  encounters: [{type: mongoose.Types.ObjectId , required:true , ref:"encounters"}],
+  sessions: [{type: mongoose.Types.ObjectId , required:true , ref:"sessions"}],
+  sessionsStartedByUser: [{type: mongoose.Types.ObjectId, ref:"sessions"}]
+
+
 
 });
 userSchema.plugin(uniqueValidator);

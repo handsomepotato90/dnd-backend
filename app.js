@@ -14,6 +14,7 @@ const myUploads = require("./routes/myUploads");
 const Friends = require("./routes/Friends");
 const ChangeUserCredentials = require("./routes/ChangeUserCredentials");
 const editMonster = require("./routes/Edit");
+const Sessions = require("./routes/routes-sessions");
 const mongoose = require("mongoose");
 
 const app = express();
@@ -50,6 +51,8 @@ app.use("/myProfile", ChangeUserCredentials);
 app.use("/myProfile/Friends", Friends);
 app.use("/myProfile/MyUploads", myUploads);
 app.use("/myProfile/MyUploads/Edit", editMonster);
+app.use("/myProfile/Sessions", Sessions);
+
 
 app.use("/", userLogin);
 
