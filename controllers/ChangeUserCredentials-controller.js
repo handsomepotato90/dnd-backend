@@ -1,6 +1,7 @@
 const express = require("express");
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
+const Session = require("../models/session");
 const router = express.Router();
 const ckeckAuth = require("../controllers/checkAuth");
 const bcrypt = require("bcryptjs");
@@ -28,31 +29,32 @@ const change_username = async (req, res, next) => {
     return next(error);
   }
   try {
-    user = await User.findByIdAndUpdate(userDataChange.uId, {
+    await User.findByIdAndUpdate(userDataChange.uId, {
       name: userDataChange.name,
     }).exec();
+    await Session.updateMany(
+      { creator: userDataChange.uId },
+      {
+        creatorName: userDataChange.name,
+      }
+    ).exec();
   } catch (err) {
     const error = new HttpError(`Something went wrong try again later.`, 500);
     return next(error);
   }
 
-  res.status(201).json();
+  res.status(201).json({ message: "Session Opened for Voting." });
 };
 
 const change_password = async (req, res, next) => {
   const userDataChange = req.body;
   let hashedPass;
-  console.log(userDataChange.password)
-
+  console.log(userDataChange.password);
 
   if (userDataChange.password.trim() !== userDataChange.re_password.trim()) {
-    const error = new HttpError(
-      `Passwords don't match. Please try again`,
-      422
-    );
+    const error = new HttpError(`Passwords don't match. Please try again`, 422);
     return next(error);
   }
-  
 
   try {
     hashedPass = await bcrypt.hash(userDataChange.password.trim(), 12);
@@ -70,7 +72,7 @@ const change_password = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json();
+  res.status(201).json({ message: "Session Opened for Voting." });
 };
 const change_mail = async (req, res, next) => {};
 

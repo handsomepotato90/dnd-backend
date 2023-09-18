@@ -4,7 +4,7 @@ const Session = require("../models/session");
 const express = require("express");
 const router = express.Router();
 const ckeckAuth = require("../controllers/checkAuth");
-const { default: mongoose } = require("mongoose");
+const sendEmail = require("./mailing/sendEmail");
 
 router.use(ckeckAuth);
 
@@ -40,6 +40,7 @@ const friends = async (req, res, next) => {
 const upload_session = async (req, res, next) => {
   const now = new Date().getTime();
   const reqUser = req.body;
+
   let user;
   let users;
   try {
@@ -63,22 +64,41 @@ const upload_session = async (req, res, next) => {
     friendsWithInvites: reqUser.invitedFriends,
     comments: [{ comment: "", user: "", username: "" }],
   });
+  //   console.log(reqUser.invitedFriends);
+  try {
+    users = await User.find({
+      _id: { $in: reqUser.invitedFriends },
+    }).exec();
+  } catch (err) {
+    const error = new HttpError(
+      `Something went wrong try again later.${err}`,
+      500
+    );
+    return next(error);
+  }
+
   try {
     await createdSession.save();
 
     reqUser.invitedFriends.forEach(
       async (user) =>
-        await User.findByIdAndUpdate(user._id, {
+        await User.findByIdAndUpdate(user, {
           $push: { sessions: createdSession._id },
         }).exec()
     );
+
     await User.findByIdAndUpdate(reqUser.userId, {
       $push: { sessionsStartedByUser: createdSession._id },
     }).exec();
   } catch (err) {
-    const error = new HttpError(`Something went wrong try again later.`, 500);
+    const error = new HttpError(
+      `Something went wrong try again later.${err}`,
+      500
+    );
     return next(error);
   }
+
+  sendEmail(createdSession.creatorName, users, "invites");
 
   res.status(201).json({ message: "Session Uploaded." });
 };
@@ -113,6 +133,7 @@ const session_invites = async (req, res, next) => {
     );
     return next(error);
   }
+
   try {
     mysessions = await Session.find({
       _id: { $in: user.sessionsStartedByUser },
@@ -148,6 +169,8 @@ const get_vote_on_invite = async (req, res, next) => {
 
 const post_vote_on_invite = async (req, res, next) => {
   let session;
+  console.log(req.body.calendarId);
+  console.log(req.body.id);
 
   let filter = {
     _id: req.body.calendarId,
@@ -163,6 +186,7 @@ const post_vote_on_invite = async (req, res, next) => {
 
     return next(error);
   }
+
   if (session.length === 0) {
     try {
       session = await Session.findByIdAndUpdate(req.body.calendarId, {
@@ -203,6 +227,23 @@ const post_vote_on_invite = async (req, res, next) => {
       return next(error);
     }
   }
+  try {
+    user = await User.findById(session.creator).exec();
+  } catch (err) {
+    const error = new HttpError(
+      `Something went wrong.There is no such Session up for voting.${err}`,
+      500
+    );
+
+    return next(error);
+  }
+
+  sendEmail(
+    req.body.username,
+    [{ email: user.email, name: user.name }],
+    "responce"
+  );
+
   res.status(201).json({ message: "Thanks for your vote." });
 };
 
@@ -229,6 +270,7 @@ const my_sessions = async (req, res, next) => {
 const schedule_session = async (req, res, next) => {
   let sessionId = req.params.id;
   let session;
+  let users;
   try {
     session = await Session.findByIdAndUpdate(sessionId, {
       status: req.body.status,
@@ -239,12 +281,37 @@ const schedule_session = async (req, res, next) => {
       `Something went wrong.There is no such Session up for voting.${err}`,
       500
     );
+
     return next(error);
   }
+  try {
+    users = await User.find({
+      _id: { $in: session.friendsWithInvites },
+    }).exec();
+  } catch (err) {
+    const error = new HttpError(
+      `Something went wrong try again later.${err}`,
+      500
+    );
+    return next(error);
+  }
+  console.log(session.creatorName);
+  console.log(users);
+  console.log(req.body.dates);
+
+  sendEmail(
+    session.creatorName,
+    users,
+    "schedule",
+    req.body.dates,
+    req.body.hours
+  );
+
   res.status(201).json({ message: "Session Opened for Voting." });
 };
 
 const comments = async (req, res, next) => {
+  console.log(req.body);
   let session;
   if (req.body.title.trim() === "") {
     const error = new HttpError(

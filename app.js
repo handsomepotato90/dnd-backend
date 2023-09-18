@@ -19,12 +19,14 @@ const mongoose = require("mongoose");
 
 const app = express();
 const port = process.env.PORT || 5000;
+const expressWs = require("express-ws")(app);
+const aWss = expressWs.getWss("/myProfile/Sessions/AllSessions/:id");
 
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    // "http://localhost:3000"
-    "https://dndragons5e.com"
+    "http://localhost:3000"
+    // "https://dndragons5e.com"
   );
 
   res.setHeader(
@@ -53,6 +55,13 @@ app.use("/myProfile/MyUploads", myUploads);
 app.use("/myProfile/MyUploads/Edit", editMonster);
 app.use("/myProfile/Sessions", Sessions);
 
+app.ws("/:id", function (ws, req) {
+  ws.on("message", function (msg) {
+    aWss.clients.forEach(function (client) {
+      client.send(msg);
+    });
+  });
+});
 
 app.use("/", userLogin);
 
