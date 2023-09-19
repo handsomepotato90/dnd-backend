@@ -77,14 +77,9 @@ const signup = async (req, res, next) => {
   }
   let token;
   try {
-    token = jwt.sign(
-      { userId: createdUser.id, userName: createdUser.name },
-      process.env.JWT_KEY,
-      {
-        algorithm: "HS256",
-        expiresIn: "30d",
-      }
-    );
+    token = jwt.sign({ userId: createdUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
@@ -148,14 +143,9 @@ const login = async (req, res, next) => {
 
   let token;
   try {
-    token = jwt.sign(
-      { userId: existingUser.id, userName: existingUser.name },
-      process.env.JWT_KEY,
-      {
-        algorithm: "HS256",
-        expiresIn: "30d",
-      }
-    );
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -222,14 +212,9 @@ const facebook = async (req, res, next) => {
     },
   });
   try {
-    token = jwt.sign(
-      { userId: existingUser.id, userName: existingUser.name },
-      process.env.JWT_KEY,
-      {
-        algorithm: "HS256",
-        expiresIn: "30d",
-      }
-    );
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
@@ -244,7 +229,11 @@ const facebook = async (req, res, next) => {
 
 const google = async (req, res, next) => {
   const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
-
+  // const decodedTokenoe = jwt.verify(
+  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzFmMmY2NGRjMTdlNTEyNGUxN2NkMGYiLCJpYXQiOjE2OTUxMjgzMTQsImV4cCI6MTY5NzcyMDMxNH0.e5aqTMiiUMKrgiZCxV3WySI9fmP7JcLK1b2XIMbC20Y",
+  //   "jh1jkhfjkhfjh;sghsiogu38so;guds8gsdg;jsgu8gu8sdg8s;djg8sdgu;8sdug8sdyg8sydg;8sdyg89sydg98sdyg;sdgy8sdyg8s9dygs9yg98sdyg9sydg98sdyg89sdygsdyg;sydg8ysd8g"
+  // );
+  // console.log(decodedTokenoe);
   const decodedToken = jwt.decode(tokens.id_token);
   let existingUser;
   let rememberMeHash;
@@ -302,14 +291,9 @@ const google = async (req, res, next) => {
   });
 
   try {
-    token = jwt.sign(
-      { userId: existingUser.id, userName: existingUser.name },
-      process.env.JWT_KEY,
-      {
-        algorithm: "HS256",
-        expiresIn: "30d",
-      }
-    );
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -346,14 +330,9 @@ const googleRefresh = async (req, res, next) => {
     return next(error);
   }
   try {
-    token = jwt.sign(
-      { userId: existingUser.id, userName: existingUser.name },
-      process.env.JWT_KEY,
-      {
-        algorithm: "HS256",
-        expiresIn: "30d",
-      }
-    );
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -389,8 +368,7 @@ const remember = async (req, res, next) => {
 
   let token;
   try {
-    token = jwt.sign({ userId: existingUser.id,userName:existingUser.name }, process.env.JWT_KEY, {
-      algorithm: "HS256",
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
       expiresIn: "30d",
     });
   } catch (err) {
