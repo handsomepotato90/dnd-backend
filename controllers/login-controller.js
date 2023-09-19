@@ -77,11 +77,9 @@ const signup = async (req, res, next) => {
   }
   let token;
   try {
-    token = jwt.sign(
-      { userId: createdUser.id, email: createdUser.email },
-      process.env.JWT_KEY,
-      { expiresIn: "30d" }
-    );
+    token = jwt.sign({ userId: createdUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
@@ -214,16 +212,9 @@ const facebook = async (req, res, next) => {
     },
   });
   try {
-    token = jwt.sign(
-      {
-        userId: existingUser.id,
-        name: existingUser.name,
-        email: existingUser.email,
-        remember: req.body.remember,
-      },
-      process.env.JWT_KEY,
-      { expiresIn: "30d" }
-    );
+    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+      expiresIn: "30d",
+    });
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);

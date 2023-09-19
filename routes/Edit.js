@@ -4,6 +4,8 @@ const Monster = require("../models/monsters");
 const router = express.Router();
 const ckeckAuth = require("../controllers/checkAuth");
 
+router.use(ckeckAuth);
+
 router.get("/:id", async (req, res, next) => {
   const monsterId = req.params.id;
   try {
@@ -15,8 +17,6 @@ router.get("/:id", async (req, res, next) => {
 
   res.status(201).json(monster);
 });
-
-router.use(ckeckAuth);
 
 router.patch("/:id", async (req, res, next) => {
   const monsterId = req.params.id;
