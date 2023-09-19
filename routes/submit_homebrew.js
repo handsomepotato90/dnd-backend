@@ -7,7 +7,7 @@ const User = require("../models/user");
 const ckeckAuth = require("../controllers/checkAuth");
 
 
-router.use(ckeckAuth);
+// router.use(ckeckAuth);
 
 router.post("/", async (req, res, next) => {
   const now = new Date().getTime();

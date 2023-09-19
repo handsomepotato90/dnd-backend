@@ -152,7 +152,7 @@ const login = async (req, res, next) => {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
   }
-  existingUser.password = undefined
+  existingUser.password = undefined;
 
   res
     .cookie("rmTOKEN", rememberMeHash, {
@@ -217,6 +217,7 @@ const facebook = async (req, res, next) => {
     token = jwt.sign(
       {
         userId: existingUser.id,
+        name: existingUser.name,
         email: existingUser.email,
         remember: req.body.remember,
       },
