@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const { UserRefreshClient } = require("google-auth-library");
-const process = require("../nodemon.json");
+// const process = require("../nodemon.json");
 const oAuth2Client = new OAuth2Client(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
@@ -77,9 +77,14 @@ const signup = async (req, res, next) => {
   }
   let token;
   try {
-    token = jwt.sign({ userId: createdUser.id }, process.env.JWT_KEY, {
-      expiresIn: "30d",
-    });
+    token = jwt.sign(
+      { userId: createdUser.id, userName: createdUser.name },
+      process.env.JWT_KEY,
+      {
+        algorithm: "HS256",
+        expiresIn: "30d",
+      }
+    );
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
@@ -143,9 +148,14 @@ const login = async (req, res, next) => {
 
   let token;
   try {
-    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
-      expiresIn: "30d",
-    });
+    token = jwt.sign(
+      { userId: existingUser.id, userName: existingUser.name },
+      process.env.JWT_KEY,
+      {
+        algorithm: "HS256",
+        expiresIn: "30d",
+      }
+    );
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -212,9 +222,14 @@ const facebook = async (req, res, next) => {
     },
   });
   try {
-    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
-      expiresIn: "30d",
-    });
+    token = jwt.sign(
+      { userId: existingUser.id, userName: existingUser.name },
+      process.env.JWT_KEY,
+      {
+        algorithm: "HS256",
+        expiresIn: "30d",
+      }
+    );
   } catch (err) {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
@@ -287,9 +302,14 @@ const google = async (req, res, next) => {
   });
 
   try {
-    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
-      expiresIn: "30d",
-    });
+    token = jwt.sign(
+      { userId: existingUser.id, userName: existingUser.name },
+      process.env.JWT_KEY,
+      {
+        algorithm: "HS256",
+        expiresIn: "30d",
+      }
+    );
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -326,9 +346,14 @@ const googleRefresh = async (req, res, next) => {
     return next(error);
   }
   try {
-    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
-      expiresIn: "30d",
-    });
+    token = jwt.sign(
+      { userId: existingUser.id, userName: existingUser.name },
+      process.env.JWT_KEY,
+      {
+        algorithm: "HS256",
+        expiresIn: "30d",
+      }
+    );
   } catch (err) {
     const error = new HttpError(`Login failed. Try again later.`, 500);
     return next(error);
@@ -364,7 +389,8 @@ const remember = async (req, res, next) => {
 
   let token;
   try {
-    token = jwt.sign({ userId: existingUser.id }, process.env.JWT_KEY, {
+    token = jwt.sign({ userId: existingUser.id,userName:existingUser.name }, process.env.JWT_KEY, {
+      algorithm: "HS256",
       expiresIn: "30d",
     });
   } catch (err) {
