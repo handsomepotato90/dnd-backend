@@ -11,7 +11,18 @@ const oAuth2Client = new OAuth2Client(
   process.env.CLIENT_SECRET,
   "postmessage"
 );
-
+function makeid(length) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}
 const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -90,7 +101,10 @@ const signup = async (req, res, next) => {
       maxAge: 365 * 24 * 60 * 60 * 1000,
       httpOnly: false,
     })
-    .json({ user: createdUser.id, token: token });
+    .json({
+      user: createdUser.toObject({ getters: true }),
+      token: token,
+    });
 };
 
 const login = async (req, res, next) => {
@@ -229,11 +243,7 @@ const facebook = async (req, res, next) => {
 
 const google = async (req, res, next) => {
   const { tokens } = await oAuth2Client.getToken(req.body.code); // exchange code for tokens
-  // const decodedTokenoe = jwt.verify(
-  //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzFmMmY2NGRjMTdlNTEyNGUxN2NkMGYiLCJpYXQiOjE2OTUxMjgzMTQsImV4cCI6MTY5NzcyMDMxNH0.e5aqTMiiUMKrgiZCxV3WySI9fmP7JcLK1b2XIMbC20Y",
-  //   "jh1jkhfjkhfjh;sghsiogu38so;guds8gsdg;jsgu8gu8sdg8s;djg8sdgu;8sdug8sdyg8sydg;8sdyg89sydg98sdyg;sdgy8sdyg8s9dygs9yg98sdyg9sydg98sdyg89sdygsdyg;sydg8ysd8g"
-  // );
-  // console.log(decodedTokenoe);
+
   const decodedToken = jwt.decode(tokens.id_token);
   let existingUser;
   let rememberMeHash;
@@ -248,19 +258,25 @@ const google = async (req, res, next) => {
     return next(error);
   }
 
-  // try {
-  //   hashedPass = await bcrypt.hash(existingUser.email, 12);
-  // } catch (err) {
-  //   const error = new HttpError(`Could not create user,plaese try again.`, 500);
-  //   return next(error);
-  // }
+  try {
+    hashedPass = await bcrypt.hash(makeid(40), 12);
+  } catch (err) {
+    const error = new HttpError(`Could not create user,plaese try again.`, 500);
+    return next(error);
+  }
 
   if (!existingUser) {
     const existingUser = new User({
-      name: decodedToken.name,
+      name: "user_" + makeid(15),
       email: decodedToken.email,
       password: hashedPass,
       monsters: [],
+      rememberMe: {
+        remember: true,
+        token: "",
+      },
+      encounters: [],
+      sessions: [],
     });
     try {
       await existingUser.save();
@@ -283,6 +299,7 @@ const google = async (req, res, next) => {
     const error = new HttpError(`Signup failed. Try again later.`, 500);
     return next(error);
   }
+
   await existingUser.updateOne({
     rememberMe: {
       remember: req.body.remember,
