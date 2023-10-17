@@ -5,10 +5,54 @@ const router = express.Router();
 const User = require("../models/user");
 const ckeckAuth = require("../controllers/checkAuth");
 
-router.use(ckeckAuth);
+router.delete("/delete", async (req, res, next) => {
+  let user;
+  try {
+    user = await User.findById(req.body.uId).exec();
+  } catch (err) {
+    const error = new HttpError(
+      `Can't fetch user.Please try again later.`,
+      500
+    );
+    return next(error);
+  }
+  for (let i = 0; i < user.calculatorSaves.length; i++) {
+    const element = user.calculatorSaves[i];
+    if (element._id == req.body.id) {
+      user.calculatorSaves.splice(i, 1);
+    }
+  }
+  const result = await user.save();
 
+  res.status(201).json({ presets: user.calculatorSaves });
+});
+
+router.patch("/rename", async (req, res, next) => {
+  let user;
+  try {
+    user = await User.findById(req.body.uId);
+  } catch (err) {
+    const error = new HttpError(
+      `Can't fetch user.Please try again later.`,
+      500
+    );
+    return next(error);
+  }
+
+  for (let i = 0; i < user.calculatorSaves.length; i++) {
+    const element = user.calculatorSaves[i];
+    if (element._id == req.body.id) {
+      element.calculationName = req.body.newName;
+    }
+  }
+  const result = await user.save();
+
+  res.status(201).json({ presets: result.calculatorSaves });
+});
+
+router.use(ckeckAuth);
 router.post("/save", async (req, res, next) => {
-  console.log(req.body);
+  let user;
   try {
     user = await User.updateOne(
       { _id: req.body.id },
@@ -28,11 +72,20 @@ router.post("/save", async (req, res, next) => {
     );
     return next(error);
   }
-  res.status(201).json();
+  try {
+    user = await User.findById(req.body.id);
+  } catch (err) {
+    const error = new HttpError(
+      `Can't fetch user.Please try again later.`,
+      500
+    );
+    return next(error);
+  }
+
+  res.status(201).json({ presets: user.calculatorSaves });
 });
 
 router.post("/load", async (req, res, next) => {
-  console.log(req.body);
   try {
     user = await User.findById({ _id: req.body.id }).select("calculatorSaves");
   } catch (err) {
@@ -42,7 +95,6 @@ router.post("/load", async (req, res, next) => {
     );
     return next(error);
   }
-  console.log(user);
   res.status(201).json({ presets: user });
 });
 
