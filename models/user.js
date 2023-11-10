@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   },
   friends: [{ type: mongoose.Types.ObjectId }],
   friendRequest: [{ type: mongoose.Types.ObjectId }],
+  user_pcs: [{ type: mongoose.Types.ObjectId, ref: "chsheets" }],
   monsters: [
     { type: mongoose.Types.ObjectId, required: true, ref: "monsters" },
   ],

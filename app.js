@@ -16,6 +16,8 @@ const Friends = require("./routes/Friends");
 const ChangeUserCredentials = require("./routes/ChangeUserCredentials");
 const editMonster = require("./routes/Edit");
 const Sessions = require("./routes/routes-sessions");
+const CharSheet = require("./routes/route-charechter_sheet");
+
 const mongoose = require("mongoose");
 
 const app = express();
@@ -26,8 +28,8 @@ const aWss = expressWs.getWss("/myProfile/Sessions/AllSessions/:id");
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    // "http://localhost:3000"
-    "https://dndragons5e.com"
+    "http://localhost:3000"
+    // "https://dndragons5e.com"
   );
 
   res.setHeader(
@@ -56,6 +58,7 @@ app.use("/myProfile/Friends", Friends);
 app.use("/myProfile/MyUploads", myUploads);
 app.use("/myProfile/MyUploads/Edit", editMonster);
 app.use("/myProfile/Sessions", Sessions);
+app.use("/myProfile/CharecterSheets", CharSheet);
 
 app.ws("/:id", function (ws, req) {
   ws.on("message", function (msg) {
