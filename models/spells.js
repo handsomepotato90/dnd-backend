@@ -13,7 +13,7 @@ const SpellsSchema = new mongoose.Schema({
   components: {
     v: { type: Boolean },
     s: { type: Boolean },
-    m: { type: String },
+    m: { type: Array },
   },
   duration: { type: Array },
   text: { type: Array },
