@@ -164,6 +164,23 @@ const updateing = async (req, res, next) => {
     );
     return next(error);
   }
+
+
+    for (let key in charecter.spells) {
+      let arraySpells = [];
+      for (let i = 0; i < charecter.spells[key].spell_ids.length; i++) {
+        const el = charecter.spells[key].spell_ids[i];
+        try {
+          spel = await Spells.findById(el);
+          arraySpells.push(spel);
+        } catch (err) {
+          const error = new HttpError(`${err}`, 500);
+          return next(error);
+        }
+      }
+      charecter.spells[key].spells = arraySpells;
+    }
+
   res.status(201).json({ charecter: charecter });
 };
 
