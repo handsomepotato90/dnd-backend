@@ -28,8 +28,8 @@ const aWss = expressWs.getWss("/myProfile/Sessions/AllSessions/:id");
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    // "http://localhost:3000"
-    "https://dndragons5e.com"
+    "http://localhost:3000"
+    // "https://dndragons5e.com"
   );
 
   res.setHeader(
