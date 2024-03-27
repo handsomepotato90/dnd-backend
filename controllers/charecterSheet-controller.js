@@ -29,6 +29,12 @@ const saving = async (req, res, next) => {
     weapons: chs.weapons,
     spells: chs.spells,
     creator: chs.creator,
+    xp: chs.xp,
+    currHp: chs.currHp,
+    tempHp: chs.tempHp,
+    inspiration: chs.inspiration,
+    specialStat: chs.specialStat,
+    specialName: chs.specialName,
   });
 
   try {
@@ -147,6 +153,12 @@ const updateing = async (req, res, next) => {
       weapons: chs.weapons,
       spells: chs.spells,
       creator: chs.creator,
+      xp: chs.xp,
+      currHp: chs.currHp,
+      tempHp: chs.tempHp,
+      inspiration: chs.inspiration,
+      specialStat: chs.specialStat,
+      specialName: chs.specialName,
     });
   } catch (err) {
     const error = new HttpError(
@@ -165,21 +177,20 @@ const updateing = async (req, res, next) => {
     return next(error);
   }
 
-
-    for (let key in charecter.spells) {
-      let arraySpells = [];
-      for (let i = 0; i < charecter.spells[key].spell_ids.length; i++) {
-        const el = charecter.spells[key].spell_ids[i];
-        try {
-          spel = await Spells.findById(el);
-          arraySpells.push(spel);
-        } catch (err) {
-          const error = new HttpError(`${err}`, 500);
-          return next(error);
-        }
+  for (let key in charecter.spells) {
+    let arraySpells = [];
+    for (let i = 0; i < charecter.spells[key].spell_ids.length; i++) {
+      const el = charecter.spells[key].spell_ids[i];
+      try {
+        spel = await Spells.findById(el);
+        arraySpells.push(spel);
+      } catch (err) {
+        const error = new HttpError(`${err}`, 500);
+        return next(error);
       }
-      charecter.spells[key].spells = arraySpells;
     }
+    charecter.spells[key].spells = arraySpells;
+  }
 
   res.status(201).json({ charecter: charecter });
 };

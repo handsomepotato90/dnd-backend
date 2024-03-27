@@ -20,8 +20,14 @@ const CharecterSheetsSchema = new mongoose.Schema({
   stats: { type: Object, required: true },
   otherProff: { type: Object },
   weapons: { type: Array },
-  spells:{ type: Object },
+  spells: { type: Object },
   creator: { type: mongoose.Types.ObjectId, required: true, ref: "users" },
+  xp: { type: Number },
+  currHp: { type: Number },
+  tempHp: { type: Number },
+  inspiration: { type: Number },
+  specialStat: { type: Number },
+  specialName: { type: String },
 });
 
 module.exports = mongoose.model("chsheets", CharecterSheetsSchema);
