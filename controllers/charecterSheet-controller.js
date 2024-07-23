@@ -79,7 +79,8 @@ const allUserPc = async (req, res, next) => {
   }
   for (let i = 0; i < char.length; i++) {
     const element = char[i];
-    for (let key in element.spells) {
+
+    for (let key in element?.spells) {
       let arraySpells = [];
       for (let i = 0; i < element.spells[key].spell_ids.length; i++) {
         const el = element.spells[key].spell_ids[i];
@@ -115,7 +116,7 @@ const search = async (req, res, next) => {
     );
     return next(error);
   }
-  // console.log(spells)
+
   res.status(201).json(spells);
 };
 const updateing = async (req, res, next) => {

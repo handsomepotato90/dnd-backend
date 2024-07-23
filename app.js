@@ -82,7 +82,7 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occured" });
 });
-
+mongoose.set("strictQuery", false);
 mongoose
   .connect(
     `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@${process.env.DB}.mcdpizu.mongodb.net/?retryWrites=true&w=majority`

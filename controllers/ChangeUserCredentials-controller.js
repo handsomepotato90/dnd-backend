@@ -49,7 +49,6 @@ const change_username = async (req, res, next) => {
 const change_password = async (req, res, next) => {
   const userDataChange = req.body;
   let hashedPass;
-  console.log(userDataChange.password);
 
   if (userDataChange.password.trim() !== userDataChange.re_password.trim()) {
     const error = new HttpError(`Passwords don't match. Please try again`, 422);

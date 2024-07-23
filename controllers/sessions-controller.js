@@ -64,7 +64,7 @@ const upload_session = async (req, res, next) => {
     friendsWithInvites: reqUser.invitedFriends,
     comments: [{ comment: "", user: "", username: "" }],
   });
-  //   console.log(reqUser.invitedFriends);
+
   try {
     users = await User.find({
       _id: { $in: reqUser.invitedFriends },
@@ -169,8 +169,6 @@ const get_vote_on_invite = async (req, res, next) => {
 
 const post_vote_on_invite = async (req, res, next) => {
   let session;
-  console.log(req.body.calendarId);
-  console.log(req.body.id);
 
   let filter = {
     _id: req.body.calendarId,
@@ -250,6 +248,7 @@ const post_vote_on_invite = async (req, res, next) => {
 const my_sessions = async (req, res, next) => {
   let sessionId = req.params.id;
   let session;
+
   try {
     session = await Session.findById(sessionId)
       .select(
@@ -295,9 +294,6 @@ const schedule_session = async (req, res, next) => {
     );
     return next(error);
   }
-  console.log(session.creatorName);
-  console.log(users);
-  console.log(req.body.dates);
 
   sendEmail(
     session.creatorName,
@@ -311,7 +307,6 @@ const schedule_session = async (req, res, next) => {
 };
 
 const comments = async (req, res, next) => {
-  console.log(req.body);
   let session;
   if (req.body.title.trim() === "") {
     const error = new HttpError(

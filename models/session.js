@@ -14,7 +14,6 @@ const sessionsSchema = new mongoose.Schema({
   friendsWithInvites: [
     { type: mongoose.Types.ObjectId, required: true, ref: "users" },
   ],
-
   votes: [
     {
       user: { type: mongoose.Types.ObjectId },

@@ -103,7 +103,7 @@ const req_friend = async (req, res, next) => {
 const res_friend = async (req, res, next) => {
   const dataReq = req.body;
   let user;
-  console.log(req.body);
+
   switch (dataReq.decision) {
     case "accept":
       try {
